@@ -1,0 +1,1389 @@
+<title>Innovation Portfolio Simulator</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: a calibration form that gives way to a two-column control/results workbench. */
+:root {
+  --bg: #FAF9F7;
+  --surface: #FFFFFF;
+  --surface-2: #F2F0EC;
+  --fg: #16181C;
+  --muted: #6B7076;
+  --line: #E1DFD9;
+  --gold: #8E7034;
+  --gold-soft: #EFE6D4;
+  --teal: #2A6764;
+  --brick: #93382C;
+  --shadow: 0 1px 2px rgba(20,24,29,.06), 0 8px 24px rgba(20,24,29,.05);
+  --plum: #5B4B8A;
+
+  --serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121418;
+    --surface: #1A1D22;
+    --surface-2: #23272E;
+    --fg: #F1EFEB;
+    --muted: #9AA0A7;
+    --line: #2C313A;
+    --gold: #CFA463;
+    --gold-soft: #2E2817;
+    --teal: #6BB0AB;
+    --brick: #CE7F70;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.3);
+    --plum: #A08FD6;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121418;
+  --surface: #1A1D22;
+  --surface-2: #23272E;
+  --fg: #F1EFEB;
+  --muted: #9AA0A7;
+  --line: #2C313A;
+  --gold: #CFA463;
+  --gold-soft: #2E2817;
+  --teal: #6BB0AB;
+  --brick: #CE7F70;
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.3);
+  --plum: #A08FD6;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 48px;
+}
+.wrap { max-width: 1120px; margin: 0 auto; }
+
+header.top { padding-block: 32px 20px; border-bottom: 1px solid var(--line); }
+h1 {
+  font-family: var(--serif);
+  font-size: clamp(28px, 4vw, 40px);
+  line-height: 1.1;
+  margin: 0 0 10px;
+  text-wrap: balance;
+  font-weight: 600;
+}
+.standfirst { color: var(--muted); max-width: 64ch; margin: 0; }
+
+.steps { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+.step-chip {
+  font-size: 12px; letter-spacing: .06em; text-transform: uppercase;
+  padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line);
+  color: var(--muted); background: var(--surface);
+}
+.step-chip { text-decoration: none; }
+.step-chip:hover { color: var(--fg); border-color: var(--gold); background: var(--gold-soft); }
+
+h2 {
+  font-family: var(--serif); font-weight: 600;
+  font-size: 22px; margin: 0 0 4px; text-wrap: balance;
+}
+.section { padding-block: 28px; }
+.section-note { color: var(--muted); margin: 0 0 18px; max-width: 70ch; }
+
+fieldset { border: none; padding: 0; margin: 0 0 24px; min-width: 0; }
+legend {
+  font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--gold); font-weight: 700; padding: 0 0 10px;
+}
+.grid {
+  display: grid; gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+}
+.field {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+  padding: 12px 14px 13px; box-shadow: var(--shadow); min-width: 0;
+}
+.field label { display: block; font-size: 13px; color: var(--fg); margin-bottom: 8px; }
+.field .hint { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+.field-row { display: flex; align-items: center; gap: 8px; }
+input[type="number"] {
+  width: 100%; min-width: 0; font-family: var(--mono); font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  padding: 7px 9px; border-radius: 6px; border: 1px solid var(--line);
+  background: var(--bg); color: var(--fg);
+}
+input[type="number"]:focus-visible, select:focus-visible, button:focus-visible, input[type="range"]:focus-visible {
+  outline: 2px solid var(--gold); outline-offset: 2px;
+}
+.unit { color: var(--muted); font-size: 13px; white-space: nowrap; }
+.tag {
+  font-size: 10px; letter-spacing: .06em; text-transform: uppercase; font-weight: 700;
+  padding: 2px 6px; border-radius: 4px; border: 1px solid var(--line);
+  color: var(--muted); background: var(--surface-2); white-space: nowrap;
+}
+.tag.mine { color: var(--gold); border-color: var(--gold); background: var(--gold-soft); }
+
+.tally {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+  padding: 14px 16px; box-shadow: var(--shadow);
+}
+.tally .count { font-family: var(--mono); font-size: 24px; font-variant-numeric: tabular-nums; }
+.tally p { margin: 0; color: var(--muted); font-size: 13px; max-width: 58ch; }
+
+a.btn { text-decoration: none; display: inline-block; }
+.btn {
+  font: inherit; font-weight: 600; cursor: pointer;
+  padding: 10px 18px; border-radius: 7px; border: 1px solid var(--gold);
+  background: var(--gold); color: #FFFFFF;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn:not(.ghost) { color: #14181D; } }
+:root[data-theme="dark"] .btn:not(.ghost) { color: #14181D; }
+.btn.ghost { background: transparent; color: var(--fg); border-color: var(--line); }
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+
+.work { display: grid; grid-template-columns: 300px 1fr; gap: 24px; align-items: start; }
+@media (min-width: 861px) {
+  #controls {
+    position: sticky; top: max(16px, env(safe-area-inset-top, 0px));
+    max-height: calc(100vh - 32px); overflow-y: auto;
+  }
+}
+@media (max-width: 860px) { .work { grid-template-columns: 1fr; } }
+
+.panel {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+  padding: 18px; box-shadow: var(--shadow); min-width: 0;
+}
+.panel h3 {
+  font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--gold); margin: 0 0 14px; font-weight: 700;
+}
+.ctrl { margin-bottom: 18px; }
+.ctrl-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.ctrl-head .name { font-size: 13px; }
+.ctrl-head .val { font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; color: var(--gold); font-weight: 600; }
+input[type="range"] { width: 100%; accent-color: var(--gold); margin-top: 6px; }
+.ctrl .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.seg { display: flex; gap: 0; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; margin-top: 6px; }
+.seg button {
+  flex: 1 1 0; min-width: 0; font: inherit; font-size: 12px; cursor: pointer;
+  padding: 7px 4px; border: none; background: var(--surface); color: var(--muted);
+}
+.seg button.on { background: var(--gold-soft); color: var(--fg); font-weight: 600; }
+
+.tiles { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); margin-bottom: 18px; }
+.tile { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; box-shadow: var(--shadow); min-width: 0; }
+.tile .k { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+.tile .v { font-family: var(--mono); font-size: 26px; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.tile .d { font-size: 12px; margin-top: 4px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.tile .d.up { color: var(--teal); }
+.tile .d.down { color: var(--brick); }
+
+.chartbox { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; box-shadow: var(--shadow); margin-bottom: 16px; min-width: 0; }
+.chartbox h4 { margin: 0 0 2px; font-size: 15px; font-family: var(--serif); font-weight: 600; }
+.chartbox .cap { margin: 0 0 12px; font-size: 12px; color: var(--muted); }
+canvas { width: 100%; display: block; }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px; font-size: 12px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.swatch { width: 11px; height: 11px; border-radius: 2px; display: inline-block; }
+
+.readout { background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; }
+.readout h4 { margin: 0 0 8px; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--gold); }
+.readout ul { margin: 0; padding-left: 18px; }
+.readout li { margin-bottom: 6px; }
+
+.facil { border-top: 1px solid var(--line); margin-top: 32px; padding-top: 24px; }
+.facil ol { max-width: 68ch; padding-left: 20px; }
+.facil li { margin-bottom: 10px; }
+footer.foot { color: var(--muted); font-size: 12px; border-top: 1px solid var(--line); margin-top: 28px; padding-top: 16px; max-width: 72ch; }
+.toast { font-size: 13px; color: var(--teal); }
+
+.lbl-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.lbl-row label { margin: 0; }
+.help-btn {
+  flex: 0 0 auto; width: 20px; height: 20px; border-radius: 50%;
+  border: 1px solid var(--line); background: var(--surface-2); color: var(--muted);
+  font: 700 12px/1 var(--sans); cursor: pointer; padding: 0;
+}
+.help-btn:hover { color: var(--fg); }
+.help-btn[aria-expanded="true"] { background: var(--gold-soft); color: var(--gold); border-color: var(--gold); }
+.help-text {
+  margin-top: 9px; font-size: 12.5px; line-height: 1.45; color: var(--fg);
+  background: var(--surface-2); border: 1px solid var(--line); border-radius: 6px; padding: 9px 11px;
+}
+.name-wrap { display: inline-flex; align-items: center; gap: 6px; }
+.helptoggle { display: flex; justify-content: flex-end; margin: -6px 0 14px; }
+
+.pipe-flow { display: flex; flex-direction: column; gap: 10px; align-items: stretch; max-width: 100%; }
+.p-stage {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+  padding: 12px 14px; box-shadow: var(--shadow); flex: 1 1 0; min-width: 0;
+}
+.p-stage.live { background: var(--gold-soft); border-color: var(--gold); display: flex; flex-direction: column; justify-content: center; }
+.p-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+.p-name { font-weight: 700; font-size: 15px; }
+.p-step { font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 2px; }
+.p-stage.live .p-note { font-size: 12px; color: var(--muted); margin: 0; }
+.mini { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; margin-bottom: 10px; }
+.mini label { font-size: 11.5px; color: var(--muted); }
+.p-stage .tag, .p-gate .tag { font-size: 9px; padding: 1px 4px; letter-spacing: .04em; }
+.mini .in-row { display: flex; align-items: center; gap: 6px; }
+.mini input[type="number"] { width: 62px; flex: 0 0 auto; font-size: 13px; padding: 4px 6px; }
+.p-gate {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+  background: var(--surface-2); border: 1px dashed var(--line); border-radius: 8px;
+  padding: 10px 8px; flex: 0 0 auto;
+}
+.p-gate .g-label { font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--gold); font-weight: 700; }
+.p-gate input[type="number"] { width: 60px; text-align: center; font-size: 13px; padding: 4px 4px; }
+.p-gate .g-sub { font-size: 10.5px; color: var(--muted); text-align: center; }
+.p-gate .g-row { display: flex; align-items: center; gap: 6px; }
+#pipeHelp .help-text { margin-top: 10px; }
+.arrow-h { display: none; }
+.arrow-v { color: var(--gold); font-size: 15px; line-height: 1; }
+@media (min-width: 1180px) {
+  .pipe-flow { flex-direction: row; overflow-x: auto; padding-bottom: 4px; }
+  .p-stage { min-width: 140px; padding: 12px 10px; }
+  .p-stage.live { flex: 0 0 150px; }
+  .p-gate { width: 80px; padding: 10px 5px; }
+  .arrow-h { display: block; color: var(--gold); font-size: 15px; line-height: 1; }
+  .arrow-v { display: none; }
+}
+.funnel {
+  margin-top: 14px; background: var(--surface-2); border: 1px solid var(--line);
+  border-radius: 8px; padding: 12px 14px; font-size: 13.5px; line-height: 1.55;
+}
+ol.howto { max-width: 76ch; padding-left: 22px; margin: 0 0 20px; color: var(--fg); }
+ol.howto li { margin-bottom: 7px; }
+ol.howto .tag { vertical-align: baseline; }
+.qmark {
+  display: inline-block; width: 17px; height: 17px; line-height: 15px; text-align: center;
+  border-radius: 50%; border: 1px solid var(--line); background: var(--surface-2);
+  color: var(--muted); font-size: 11px; font-weight: 700;
+}
+.part-note { color: var(--muted); font-size: 13px; margin: 0 0 14px; max-width: 76ch; }
+.funnel b { font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--gold); }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>Innovation Portfolio Simulator</h1>
+    <p class="standfirst">First put in your own numbers. Then change the settings and see what happens to cost, value, time and risk. The model runs 300 times after every change, so you see a range of possible results, not one answer.</p>
+    <div class="steps">
+      <a class="step-chip" href="#step1">1 — Your numbers</a>
+      <a class="step-chip" href="#step2">2 — Settings and results</a>
+    </div>
+  </header>
+
+  <!-- ===================== STEP 1 ===================== -->
+  <section class="section" id="step1">
+    <h2>1. Start with what you know</h2>
+    <ol class="howto">
+      <li>Go through the boxes below. Change every number you know. Numbers you do not know can stay as they are.</li>
+      <li>Each number is marked <span class="tag mine">yours</span> or <span class="tag">default</span>. A default is an example number, not real data.</li>
+      <li>Press the <span class="qmark">?</span> next to any box to read what the number means and how to find it.</li>
+      <li>When you have finished, scroll down to the settings. You can come back and change these numbers at any time.</li>
+    </ol>
+
+    <div class="helptoggle"><button class="btn ghost" type="button" aria-pressed="false" style="padding:6px 12px;font-size:13px;">Show all explanations</button></div>
+
+    <fieldset>
+      <legend>Part 1 — Your people and your costs</legend>
+      <p class="part-note">Three numbers about the team you have today.</p>
+      <div class="grid" id="g-base"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Part 2 — The four steps an idea goes through</legend>
+      <p class="part-note">An idea moves from left to right. After each step there is a gate, where you decide to continue or to stop. In each white box, say how much work the step takes and how many weeks it takes. In each grey gate, say what percentage of ideas continue. The line under the picture shows what your numbers do to 100 ideas.</p>
+      <div class="pipe-flow" id="pipeDiagram"></div>
+      <div id="pipeHelp"></div>
+      <div class="funnel" id="funnel"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Part 3 — What success is worth, and what a mistake costs</legend>
+      <p class="part-note">The model uses three sizes of idea: a small improvement, an extension, and something completely new.</p>
+      <div class="grid" id="g-value"></div>
+    </fieldset>
+
+    <div class="tally">
+      <span class="count" id="tallyCount">0 of 18</span>
+      <p id="tallyText">numbers are yours. The rest are examples. Change what you can before the meeting, and change the rest together in the room.</p>
+    </div>
+    <div class="btn-row">
+      <a class="btn" href="#step2">Go to the settings</a>
+      <button class="btn ghost" id="resetDefaults">Put the example numbers back</button>
+    </div>
+  </section>
+
+  <!-- ===================== STEP 2 ===================== -->
+  <section class="section" id="step2">
+    <h2>2. Try different settings</h2>
+    <ol class="howto">
+      <li>Move one slider. Leave the others where they are. The results update straight away.</li>
+      <li>Look at the six boxes at the top and at the first chart.</li>
+      <li>Press <strong>Save this setting</strong> before you change anything else. Every box will then show the difference against the setting you saved.</li>
+      <li>Press the <span class="qmark">?</span> next to any slider to read what it does.</li>
+    </ol>
+    <p class="section-note"><a class="btn ghost" href="#step1" style="padding:4px 10px;font-size:13px;">Go back to my numbers</a></p>
+
+    <div class="work">
+      <div class="panel" id="controls">
+        <h3>Move one slider at a time</h3>
+        <div class="helptoggle"><button class="btn ghost" type="button" aria-pressed="false" style="padding:5px 10px;font-size:12px;">Show all explanations</button></div>
+
+        <div class="ctrl" data-help="horizon">
+          <div class="ctrl-head"><span class="name">How many years to look ahead</span><span class="val" id="v-horizon">5 years</span></div>
+          <input type="range" id="s-horizon" min="1" max="7" step="1" value="5">
+        </div>
+
+        <div class="ctrl" data-help="share">
+          <div class="ctrl-head"><span class="name">How much of the team works on new ideas</span><span class="val" id="v-share">10%</span></div>
+          <input type="range" id="s-share" min="0" max="30" step="1" value="10">
+          <div class="sub" id="sub-share"></div>
+        </div>
+
+        <div class="ctrl" data-help="trans">
+          <div class="ctrl-head"><span class="name">Share that is completely new</span><span class="val" id="v-trans">10%</span></div>
+          <input type="range" id="s-trans" min="0" max="40" step="5" value="10">
+        </div>
+
+        <div class="ctrl" data-help="adj">
+          <div class="ctrl-head"><span class="name">Share that extends what we do</span><span class="val" id="v-adj">20%</span></div>
+          <input type="range" id="s-adj" min="0" max="50" step="5" value="20">
+          <div class="sub" id="sub-mix"></div>
+        </div>
+
+        <div class="ctrl" data-help="strict">
+          <div class="ctrl-head"><span class="name">How strict the gates are</span><span class="val" id="v-strict">As entered</span></div>
+          <input type="range" id="s-strict" min="60" max="140" step="5" value="100">
+          <div class="sub">Strict gates stop more ideas, and keep the better ones.</div>
+        </div>
+
+        <div class="ctrl" data-help="pace">
+          <div class="ctrl-head"><span class="name">How fast each step runs</span><span class="val" id="v-pace">As entered</span></div>
+          <input type="range" id="s-pace" min="60" max="160" step="10" value="100">
+          <div class="sub">Against the weeks you entered above.</div>
+        </div>
+
+        <div class="ctrl" data-help="prot">
+          <div class="ctrl-head"><span class="name">How much of that time is protected</span><span class="val" id="v-prot">100%</span></div>
+          <input type="range" id="s-prot" min="0" max="100" step="10" value="100">
+          <div class="sub">Time that normal work cannot take back.</div>
+        </div>
+
+        <div class="ctrl" data-help="width">
+          <div class="ctrl-head"><span class="name">How big the pilot is</span></div>
+          <div class="seg" id="seg-width">
+            <button data-w="0" class="on">One boutique</button>
+            <button data-w="1">One market</button>
+            <button data-w="2">All markets</button>
+          </div>
+          <div class="sub" id="sub-width"></div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn ghost" id="pinBase">Save this setting</button>
+          <button class="btn ghost" id="copySummary">Copy the numbers</button>
+        </div>
+        <div class="toast" id="toast" style="margin-top:8px;"></div>
+      </div>
+
+      <div id="results" style="min-width:0;">
+        <div class="tiles" id="tiles"></div>
+
+        <div class="chartbox">
+          <h4>Money spent and money earned</h4>
+          <p class="cap">The red line is what you spend. The green line is what you earn. The shaded area shows how different the result can be. Amounts are in Swiss francs: k is thousands, m is millions.</p>
+          <canvas id="c-money" height="260"></canvas>
+          <div class="legend">
+            <span><i class="swatch" style="background:var(--brick)"></i>Money spent</span>
+            <span><i class="swatch" style="background:var(--teal)"></i>Money earned, middle result</span>
+            <span><i class="swatch" style="background:var(--gold)"></i>The point you get your money back</span>
+          </div>
+        </div>
+
+        <div class="chartbox">
+          <h4>How many ideas are at each step</h4>
+          <p class="cap">Average number of ideas at each step, month by month.</p>
+          <canvas id="c-pipe" height="220"></canvas>
+          <div class="legend" id="pipeLegend"></div>
+        </div>
+
+        <div class="chartbox">
+          <h4>How different the result can be</h4>
+          <p class="cap">The result of 300 runs. Everything to the left of the gold line lost money.</p>
+          <canvas id="c-dist" height="200"></canvas>
+        </div>
+
+        <div class="readout">
+          <h4>What these settings mean</h4>
+          <ul id="readout"></ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="facil">
+      <h2>Three things to try</h2>
+      <ol>
+        <li>Find a setting where you get your money back within three years. What did you have to give up? Would your board accept that?</li>
+        <li>Leave everything else where it is. Move the gate slider slowly from one end to the other. The result gets worse at both ends. Where are your gates today, and which way are you moving?</li>
+        <li>Give more of the team to new ideas, then set protected time to zero. Explain to the group why the extra money bought almost nothing.</li>
+      </ol>
+    </div>
+
+    <footer class="foot">
+      This model is a tool for discussion, not a prediction. It assumes that money only comes from ideas that reach launch, that the number of people, not the budget, limits how much can run at the same time, and that unprotected time gets taken back by normal work. Change the numbers at the top of the page until the model argues with you honestly. The three sizes of idea used here — small improvement, extension, and completely new — are usually called core, adjacent and transformational.
+    </footer>
+  </section>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------------- calibration fields ---------------- */
+  var FIELDS = [
+    { id: "engineers", group: "g-base", label: "People who could work on a new idea", unit: "people", def: 120, step: 1,
+      help: "Count your engineers, testers and platform people. Count only people you could move onto a new idea. Do not count people you could never move." },
+    { id: "costPer", group: "g-base", label: "Full cost of one person for a year", unit: "CHF thousand", def: 95, step: 1,
+      help: "Salary, employer costs, laptop, tools and office space. Your finance team will have this number. If not, take the engineering budget for one year and divide it by the number of people." },
+    { id: "scaleCost", group: "g-base", label: "Cost to keep one idea running, per year", unit: "CHF thousand", def: 60, step: 10,
+      help: "After an idea is launched, someone has to support it and fix it. This is the cost of that, for one idea, for one year. You pay it every year for as long as the idea exists." },
+
+    { id: "eFrame", group: "pipe", label: "Work needed", unit: "person-weeks", def: 3, step: 1,
+      help: "How much work it takes to write down the problem, say which part of the business it helps, and agree what has to be true for it to work. Usually a few days for two or three people." },
+    { id: "eExplore", group: "pipe", label: "Work needed", unit: "person-weeks", def: 10, step: 1,
+      help: "How much work it takes to find the cheapest way to test the main assumption. Reading, talking to people, a small technical trial. You do not build the real product yet." },
+    { id: "eTest", group: "pipe", label: "Work needed", unit: "person-weeks", def: 26, step: 1,
+      help: "How much work it takes to build something real enough to show to users, with measurement built in from the start." },
+    { id: "ePilot", group: "pipe", label: "Work needed", unit: "person-weeks", def: 48, step: 2,
+      help: "How much work it takes to make it safe to use, put it behind a switch so you can turn it off, and run it with real customers for a set period." },
+    { id: "dFrame", group: "pipe", label: "Time it takes", unit: "weeks", def: 2, step: 1,
+      help: "How many weeks pass from starting to the first decision. This is calendar time, not work time, so include the time spent waiting for people." },
+    { id: "dExplore", group: "pipe", label: "Time it takes", unit: "weeks", def: 6, step: 1,
+      help: "How many weeks pass from the first decision to the second. If this work usually waits in a queue behind normal work, put the real number here." },
+    { id: "dTest", group: "pipe", label: "Time it takes", unit: "weeks", def: 9, step: 1,
+      help: "How many weeks pass while you build it and get a clear result from users. Include the time it takes to find those users." },
+    { id: "dPilot", group: "pipe", label: "Time it takes", unit: "weeks", def: 14, step: 1,
+      help: "How many weeks the pilot runs for. A pilot in one boutique takes longer to give a clear answer. The model adjusts this later, when you choose how big the pilot is." },
+
+    { id: "pFrame", group: "pipe", label: "Pass gate 1", unit: "%", def: 60, step: 5,
+      help: "Out of 10 ideas you write down, how many are worth looking into? Most companies say yes to almost everything here, and then get strict too late." },
+    { id: "pExplore", group: "pipe", label: "Pass gate 2", unit: "%", def: 50, step: 5,
+      help: "Out of 10 ideas you look into, how many still look good after you check the facts? If you have never stopped one here, the honest answer is 10." },
+    { id: "pTest", group: "pipe", label: "Pass gate 3", unit: "%", def: 40, step: 5,
+      help: "Out of 10 things you build and show to users, how many work well enough to try with real customers?" },
+    { id: "pPilot", group: "pipe", label: "Pass gate 4", unit: "%", def: 50, step: 5,
+      help: "Out of 10 pilots, how many get a permanent owner and a budget? Stopping the other ones is a good result, not a failure." },
+
+    { id: "vCore", group: "g-value", label: "Value of one small improvement, per year", unit: "CHF thousand", def: 250, step: 10,
+      help: "A small improvement makes something you already do work better. Count only money saved or money earned, in one full year, once it is working. Use an average one. Strict gates raise what you really get. Loose gates lower it." },
+    { id: "vAdj", group: "g-value", label: "Value of one extension, per year", unit: "CHF thousand", def: 1200, step: 50,
+      help: "An extension takes something you already do well into a new area close to it. For example, a new service built on a system you already have." },
+    { id: "vTrans", group: "g-value", label: "Value of one completely new thing, per year", unit: "CHF thousand", def: 6000, step: 100,
+      help: "A new product, a new way of making money, a new market. These rarely work, which is why the number is large. If you cannot guess it, use the smallest result that would have made the attempt worth starting." },
+    { id: "ramp", group: "g-value", label: "Months to reach full value", unit: "months", def: 12, step: 1,
+      help: "Value does not start on day one. This is how many months it takes to reach the yearly number above, counting from launch. People need time to learn it and use it." },
+    { id: "advProb", group: "g-value", label: "Chance a full-size pilot goes wrong", unit: "%", def: 20, step: 5,
+      help: "Out of 10 pilots run in all markets at once, how many would cause real damage? Damage means harm to the brand, a problem with customer data, or having to stop in public. Small pilots make this much lower." },
+    { id: "advCost", group: "g-value", label: "Cost of one thing going wrong", unit: "CHF thousand", def: 1500, step: 100,
+      help: "Everything it costs: putting it right, lawyers, lost sales, and repairing the brand. Use a high number. This is what makes small pilots look cheap." }
+  ];
+
+  var CTRL_HELP = {
+    "horizon": "How many years the model looks ahead. You spend the money early and the value comes late, so the same settings look bad after two years and good after five. Change this first, and agree the number with your board.",
+    "share": "How much of your total engineering time goes to new ideas instead of normal work. This is the main cost. You pay these people whether or not anything reaches a customer.",
+    "trans": "How many of your ideas aim at something completely new. These rarely work. They cost more and take longer. They are also where almost all the big wins come from.",
+    "adj": "How many of your ideas extend what you already do into a close new area. Small improvements take whatever is left over. The split is shown below the slider.",
+    "strict": "Two things happen at once. Strict gates stop more ideas early, so fewer reach launch. Strict gates also pick better ideas, so the ones that survive are worth more. The result gets worse at both ends of this slider, so there is a best point in the middle.",
+    "pace": "This changes every time you entered in part 2 above. Faster means you learn sooner, but each step has less room to give a clear answer. Slower means people are tied up for longer, so less new work can start.",
+    "prot": "How much of the innovation time is safe when normal work is late. Unprotected time costs the same money but keeps getting interrupted, so every step takes longer and the money buys much less.",
+    "width": "How many customers see the pilot. One boutique is slow to give an answer but very safe. All markets gives the fastest answer and the biggest risk. This is the main way you control risk."
+  };
+
+  var inputs = {};
+
+  var PIPE = [
+    { name: "Define", step: "Step 1", eff: "eFrame", dur: "dFrame", gate: "pFrame", gateName: "Gate 1" },
+    { name: "Explore", step: "Step 2", eff: "eExplore", dur: "dExplore", gate: "pExplore", gateName: "Gate 2" },
+    { name: "Test", step: "Step 3", eff: "eTest", dur: "dTest", gate: "pTest", gateName: "Gate 3" },
+    { name: "Pilot", step: "Step 4", eff: "ePilot", dur: "dPilot", gate: "pPilot", gateName: "Gate 4" }
+  ];
+
+  function fieldDef(id) {
+    for (var i = 0; i < FIELDS.length; i++) if (FIELDS[i].id === id) return FIELDS[i];
+    return null;
+  }
+
+  function makeNumber(f) {
+    var inp = document.createElement("input");
+    inp.type = "number";
+    inp.id = "f-" + f.id;
+    inp.value = String(f.def);
+    inp.step = String(f.step);
+    inp.min = "0";
+    var tag = document.createElement("span");
+    tag.className = "tag";
+    tag.textContent = "default";
+    inputs[f.id] = { el: inp, tag: tag, def: f.def };
+    inp.addEventListener("input", function () {
+      markField(f.id); updateTally(); updateFunnel(); shareText(); scheduleRun();
+    });
+    return { inp: inp, tag: tag };
+  }
+
+  function buildFields() {
+    FIELDS.forEach(function (f) {
+      var host = document.getElementById(f.group);
+      if (!host) return;
+      var wrap = document.createElement("div");
+      wrap.className = "field";
+
+      var lrow = document.createElement("div");
+      lrow.className = "lbl-row";
+      var lab = document.createElement("label");
+      lab.setAttribute("for", "f-" + f.id);
+      lab.textContent = f.label;
+      lrow.appendChild(lab);
+      lrow.appendChild(helpButton("h-" + f.id, f.label));
+      wrap.appendChild(lrow);
+
+      var made = makeNumber(f);
+      var row = document.createElement("div");
+      row.className = "field-row";
+      row.appendChild(made.inp);
+      var u = document.createElement("span");
+      u.className = "unit";
+      u.textContent = f.unit;
+      row.appendChild(u);
+      row.appendChild(made.tag);
+      wrap.appendChild(row);
+
+      wrap.appendChild(helpPanel("h-" + f.id, f.help));
+      host.appendChild(wrap);
+    });
+    buildPipeline();
+  }
+
+  function miniRow(f) {
+    var m = document.createElement("div");
+    m.className = "mini";
+    var lab = document.createElement("label");
+    lab.setAttribute("for", "f-" + f.id);
+    lab.textContent = f.label + " (" + f.unit + ")";
+    m.appendChild(lab);
+    var row = document.createElement("div");
+    row.className = "in-row";
+    var made = makeNumber(f);
+    row.appendChild(made.inp);
+    row.appendChild(made.tag);
+    m.appendChild(row);
+    return m;
+  }
+
+  function buildPipeline() {
+    var host = document.getElementById("pipeDiagram");
+    var helpHost = document.getElementById("pipeHelp");
+    if (!host || !helpHost) return;
+
+    PIPE.forEach(function (st) {
+      var eff = fieldDef(st.eff), dur = fieldDef(st.dur), gate = fieldDef(st.gate);
+
+      var box = document.createElement("div");
+      box.className = "p-stage";
+      var head = document.createElement("div");
+      head.className = "p-head";
+      var names = document.createElement("div");
+      var sp = document.createElement("span");
+      sp.className = "p-step";
+      sp.textContent = st.step;
+      var nm = document.createElement("span");
+      nm.className = "p-name";
+      nm.textContent = st.name;
+      names.appendChild(sp); names.appendChild(nm);
+      head.appendChild(names);
+      head.appendChild(helpButton("h-phase-" + st.eff, "the " + st.name + " step"));
+      box.appendChild(head);
+      box.appendChild(miniRow(eff));
+      box.appendChild(miniRow(dur));
+      helpHost.appendChild(helpPanel("h-phase-" + st.eff, st.name + " — " + eff.help + " " + dur.help));
+      host.appendChild(box);
+
+      var g = document.createElement("div");
+      g.className = "p-gate";
+      var av = document.createElement("div"); av.className = "arrow-v"; av.textContent = "\u25BC";
+      var ah = document.createElement("div"); ah.className = "arrow-h"; ah.textContent = "\u25B6";
+      g.appendChild(av); g.appendChild(ah);
+      var gl = document.createElement("div");
+      gl.className = "g-label";
+      gl.textContent = st.gateName;
+      g.appendChild(gl);
+      var made = makeNumber(gate);
+      g.appendChild(made.inp);
+      var gs = document.createElement("div");
+      gs.className = "g-sub";
+      gs.textContent = "% continue";
+      g.appendChild(gs);
+      var grow = document.createElement("div");
+      grow.className = "g-row";
+      grow.appendChild(made.tag);
+      grow.appendChild(helpButton("h-" + gate.id, st.gateName));
+      g.appendChild(grow);
+      helpHost.appendChild(helpPanel("h-" + gate.id, st.gateName + " — " + gate.help));
+      host.appendChild(g);
+    });
+
+    var liveBox = document.createElement("div");
+    liveBox.className = "p-stage live";
+    var ls = document.createElement("span");
+    ls.className = "p-step";
+    ls.textContent = "Outcome";
+    var ln = document.createElement("span");
+    ln.className = "p-name";
+    ln.textContent = "Live";
+    var lp = document.createElement("p");
+    lp.className = "p-note";
+    lp.textContent = "The idea is now a normal product. It earns money and it costs money to run.";
+    liveBox.appendChild(ls); liveBox.appendChild(ln); liveBox.appendChild(lp);
+    host.appendChild(liveBox);
+
+    updateFunnel();
+  }
+
+  function updateFunnel() {
+    var el = document.getElementById("funnel");
+    if (!el || !inputs.pFrame) return;
+    var rates = [val("pFrame"), val("pExplore"), val("pTest"), val("pPilot")].map(function (p) { return p / 100; });
+    var n = 100, counts = [];
+    for (var i = 0; i < 4; i++) { n = n * rates[i]; counts.push(n); }
+    var effort = val("eFrame") + val("eExplore") + val("eTest") + val("ePilot");
+    var weeks = val("dFrame") + val("dExplore") + val("dTest") + val("dPilot");
+    var fmt = function (x) { return x >= 10 ? Math.round(x) : x.toFixed(1); };
+
+    el.innerHTML = "";
+    var p1 = document.createElement("div");
+    p1.appendChild(document.createTextNode("Out of 100 ideas you write down: "));
+    [["reach Explore", counts[0]], ["reach Test", counts[1]], ["reach Pilot", counts[2]], ["are launched", counts[3]]]
+      .forEach(function (pair, i) {
+        var b = document.createElement("b");
+        b.textContent = fmt(pair[1]);
+        p1.appendChild(b);
+        p1.appendChild(document.createTextNode(" " + pair[0] + (i < 3 ? ", " : ". ")));
+      });
+    el.appendChild(p1);
+
+    var p2 = document.createElement("div");
+    p2.appendChild(document.createTextNode("One idea that goes all the way takes "));
+    var b1 = document.createElement("b"); b1.textContent = String(Math.round(weeks));
+    p2.appendChild(b1);
+    p2.appendChild(document.createTextNode(" weeks from start to finish and "));
+    var b2 = document.createElement("b"); b2.textContent = String(Math.round(effort));
+    p2.appendChild(b2);
+    p2.appendChild(document.createTextNode(" person-weeks of work. If you also count the ideas that stop on the way, each launched idea costs about "));
+    var perSuccess = counts[3] > 0 ? (100 * val("eFrame")
+      + 100 * rates[0] * val("eExplore")
+      + 100 * rates[0] * rates[1] * val("eTest")
+      + 100 * rates[0] * rates[1] * rates[2] * val("ePilot")) / counts[3] : 0;
+    var b3 = document.createElement("b");
+    b3.textContent = counts[3] > 0 ? String(Math.round(perSuccess)) : "—";
+    p2.appendChild(b3);
+    p2.appendChild(document.createTextNode(" person-weeks in total."));
+    el.appendChild(p2);
+  }
+
+  function helpButton(panelId, label) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "help-btn";
+    b.textContent = "?";
+    b.setAttribute("aria-expanded", "false");
+    b.setAttribute("aria-controls", panelId);
+    b.setAttribute("aria-label", "Explain " + label.toLowerCase());
+    b.addEventListener("click", function () {
+      var panel = document.getElementById(panelId);
+      var open = b.getAttribute("aria-expanded") === "true";
+      b.setAttribute("aria-expanded", open ? "false" : "true");
+      panel.hidden = open;
+    });
+    return b;
+  }
+
+  function helpPanel(id, text) {
+    var d = document.createElement("div");
+    d.className = "help-text";
+    d.id = id;
+    d.textContent = text;
+    d.hidden = true;
+    return d;
+  }
+
+  function setAllHelp(open) {
+    Array.prototype.forEach.call(document.querySelectorAll(".help-btn"), function (b) {
+      b.setAttribute("aria-expanded", open ? "true" : "false");
+      var panel = document.getElementById(b.getAttribute("aria-controls"));
+      if (panel) panel.hidden = !open;
+    });
+    Array.prototype.forEach.call(document.querySelectorAll(".helptoggle button"), function (t) {
+      t.textContent = open ? "Hide all explanations" : "Show all explanations";
+      t.setAttribute("aria-pressed", open ? "true" : "false");
+    });
+  }
+
+  function markField(id) {
+    var rec = inputs[id];
+    var mine = Number(rec.el.value) !== rec.def && rec.el.value !== "";
+    rec.tag.textContent = mine ? "yours" : "default";
+    rec.tag.className = "tag" + (mine ? " mine" : "");
+  }
+
+  function updateTally() {
+    var mine = 0;
+    FIELDS.forEach(function (f) {
+      var rec = inputs[f.id];
+      if (Number(rec.el.value) !== rec.def && rec.el.value !== "") mine++;
+    });
+    document.getElementById("tallyCount").textContent = mine + " of " + FIELDS.length;
+    var t = document.getElementById("tallyText");
+    if (mine === 0) {
+      t.textContent = "numbers are yours. Everything is still an example, so treat the result as a shape, not as a real answer.";
+    } else if (mine < FIELDS.length / 2) {
+      t.textContent = "numbers are yours. Change a few more and the results start to mean something.";
+    } else {
+      t.textContent = "numbers are yours. The model is now working with your own numbers.";
+    }
+  }
+
+  function val(id) {
+    var v = Number(inputs[id].el.value);
+    return isFinite(v) && v >= 0 ? v : inputs[id].def;
+  }
+
+  /* ---------------- settings ---------------- */
+  var S = { horizon: 5, share: 10, trans: 10, adj: 20, strict: 100, pace: 100, prot: 100, width: 0 };
+  var WIDTH_NAME = ["one boutique", "one market", "all markets"];
+  var WIDTH_PROB = [0.15, 0.4, 1.0];
+  var WIDTH_COST = [0.3, 0.6, 1.0];
+  var WIDTH_DUR = [1.3, 1.0, 0.85];
+
+  var CLASSES = [
+    { key: "core", name: "Small improvement", passMul: 1.25, effortMul: 0.8, durMul: 0.9 },
+    { key: "adj", name: "Extension", passMul: 1.0, effortMul: 1.0, durMul: 1.0 },
+    { key: "trans", name: "Completely new", passMul: 0.8, effortMul: 1.7, durMul: 1.5 }
+  ];
+
+  /* ---------------- model ---------------- */
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function buildParams() {
+    var W2M = 12 / 52;
+    var effort = [val("eFrame"), val("eExplore"), val("eTest"), val("ePilot")];
+    var durW = [val("dFrame"), val("dExplore"), val("dTest"), val("dPilot")];
+    var pace = S.pace / 100;
+    var dur = durW.map(function (w, i) {
+      var m = Math.max(0.25, w * W2M * pace);
+      if (i === 3) m *= WIDTH_DUR[S.width];
+      return m;
+    });
+    var fte = effort.map(function (e, i) { return (e * W2M) / dur[i]; });
+    var pass = [val("pFrame"), val("pExplore"), val("pTest"), val("pPilot")].map(function (p) { return p / 100; });
+    var sel = Math.max(0, Math.min(1, (S.strict - 60) / 80));
+    var strictScale = (200 - S.strict) / 100;
+
+    var transShare = S.trans / 100;
+    var adjShare = Math.min(1 - transShare, S.adj / 100);
+    var coreShare = Math.max(0, 1 - transShare - adjShare);
+
+    var capacity = val("engineers") * (S.share / 100);
+    var protFrac = S.prot / 100;
+    var preempt = 1 + 0.9 * (1 - protFrac);
+
+    return {
+      months: S.horizon * 12,
+      dur: dur, fte: fte, pass: pass, sel: sel, strictScale: strictScale,
+      mix: [coreShare, adjShare, transShare],
+      capacity: capacity,
+      preempt: preempt,
+      monthlyCost: capacity * (val("costPer") / 12),
+      scaleCost: val("scaleCost") / 12,
+      value: [val("vCore") / 12, val("vAdj") / 12, val("vTrans") / 12],
+      ramp: Math.max(1, val("ramp")),
+      advProb: (val("advProb") / 100) * WIDTH_PROB[S.width],
+      advCost: val("advCost") * WIDTH_COST[S.width]
+    };
+  }
+
+  function runOnce(P, rnd, pipeAcc) {
+    var months = P.months;
+    var live = [];
+    var items = [];
+    var cost = 0, value = 0;
+    var cumCost = new Float64Array(months);
+    var cumValue = new Float64Array(months);
+    var advTotal = 0, firstValue = -1;
+    var liveCount = [0, 0, 0];
+
+    for (var m = 0; m < months; m++) {
+      // demand and stretch
+      var demand = 0, i;
+      for (i = 0; i < items.length; i++) demand += P.fte[items[i].stage] * CLASSES[items[i].cls].effortMul;
+      var stretch = Math.max(1, demand / Math.max(0.01, P.capacity)) * P.preempt;
+
+      // advance
+      var next = [];
+      for (i = 0; i < items.length; i++) {
+        var it = items[i];
+        it.prog += 1 / stretch;
+        var need = P.dur[it.stage] * CLASSES[it.cls].durMul;
+        if (it.prog >= need) {
+          var mf = (1 - P.sel) + 2 * P.sel * it.merit;
+          var p = Math.min(0.97, Math.max(0.01, P.pass[it.stage] * CLASSES[it.cls].passMul * P.strictScale * mf));
+          if (rnd() < p) {
+            if (it.stage === 3) {
+              live.push({ cls: it.cls, start: m, merit: it.merit });
+              liveCount[it.cls]++;
+            } else {
+              it.stage++; it.prog = 0;
+              if (it.stage === 3 && rnd() < P.advProb) { advTotal += P.advCost; cost += P.advCost; }
+              next.push(it);
+            }
+          }
+        } else {
+          next.push(it);
+        }
+      }
+      items = next;
+
+      // start new work into spare capacity
+      demand = 0;
+      for (i = 0; i < items.length; i++) demand += P.fte[items[i].stage] * CLASSES[items[i].cls].effortMul;
+      var spare = P.capacity / P.preempt - demand;
+      var guard = 0;
+      while (spare >= P.fte[0] * 0.8 && guard < 20) {
+        var r = rnd(), cls = r < P.mix[0] ? 0 : (r < P.mix[0] + P.mix[1] ? 1 : 2);
+        items.push({ cls: cls, stage: 0, prog: 0, merit: rnd() });
+        spare -= P.fte[0] * CLASSES[cls].effortMul;
+        guard++;
+      }
+
+      // money
+      cost += P.monthlyCost;
+      for (i = 0; i < live.length; i++) {
+        var age = m - live[i].start + 1;
+        var f = Math.min(1, age / P.ramp);
+        value += P.value[live[i].cls] * 2 * live[i].merit * f;
+        cost += P.scaleCost;
+      }
+      if (firstValue < 0 && live.length > 0) firstValue = m;
+      cumCost[m] = cost; cumValue[m] = value;
+
+      if (pipeAcc) {
+        for (i = 0; i < items.length; i++) pipeAcc[items[i].stage][m] += 1;
+        pipeAcc[4][m] += live.length;
+      }
+    }
+    return { cost: cumCost, value: cumValue, adv: advTotal, firstValue: firstValue, liveCount: liveCount };
+  }
+
+  var RUNS = 300;
+
+  function simulate() {
+    var P = buildParams();
+    var months = P.months;
+    var pipe = [];
+    for (var s = 0; s < 5; s++) pipe.push(new Float64Array(months));
+
+    var nets = [];
+    var valueRuns = [];
+    var costMed = new Float64Array(months);
+    var advs = [], firsts = [], lives = [0, 0, 0];
+    var posAt36 = 0, posAtEnd = 0;
+    var seedBase = 20261021;
+
+    for (var r = 0; r < RUNS; r++) {
+      var rnd = mulberry32(seedBase + r * 7919);
+      var out = runOnce(P, rnd, r < 40 ? pipe : null);
+      valueRuns.push(out.value);
+      for (var m = 0; m < months; m++) costMed[m] += out.cost[m] / RUNS;
+      var net = out.value[months - 1] - out.cost[months - 1];
+      nets.push(net);
+      if (net > 0) posAtEnd++;
+      var i36 = Math.min(months - 1, 35);
+      if (out.value[i36] - out.cost[i36] > 0) posAt36++;
+      advs.push(out.adv);
+      if (out.firstValue >= 0) firsts.push(out.firstValue);
+      lives[0] += out.liveCount[0] / RUNS;
+      lives[1] += out.liveCount[1] / RUNS;
+      lives[2] += out.liveCount[2] / RUNS;
+    }
+    var pipeRuns = Math.min(40, RUNS);
+    for (var s2 = 0; s2 < 5; s2++) for (var m2 = 0; m2 < months; m2++) pipe[s2][m2] /= pipeRuns;
+
+    // percentiles of value per month
+    var vMed = new Float64Array(months), vLo = new Float64Array(months), vHi = new Float64Array(months);
+    var col = new Float64Array(RUNS);
+    for (var m3 = 0; m3 < months; m3++) {
+      for (var r2 = 0; r2 < RUNS; r2++) col[r2] = valueRuns[r2][m3];
+      var sorted = Array.prototype.slice.call(col).sort(function (a, b) { return a - b; });
+      vMed[m3] = sorted[Math.floor(RUNS * 0.5)];
+      vLo[m3] = sorted[Math.floor(RUNS * 0.1)];
+      vHi[m3] = sorted[Math.floor(RUNS * 0.9)];
+    }
+
+    var breakeven = -1;
+    for (var m4 = 0; m4 < months; m4++) { if (costMed[m4] > 0 && vMed[m4] >= costMed[m4]) { breakeven = m4; break; } }
+
+    nets.sort(function (a, b) { return a - b; });
+    advs.sort(function (a, b) { return a - b; });
+    firsts.sort(function (a, b) { return a - b; });
+
+    return {
+      P: P, months: months, pipe: pipe,
+      cost: costMed, vMed: vMed, vLo: vLo, vHi: vHi,
+      nets: nets, netMed: nets[Math.floor(RUNS * 0.5)],
+      netLo: nets[Math.floor(RUNS * 0.1)], netHi: nets[Math.floor(RUNS * 0.9)],
+      breakeven: breakeven,
+      pPos: posAtEnd / RUNS, pPos36: posAt36 / RUNS,
+      advMed: advs[Math.floor(RUNS * 0.5)],
+      firstMed: firsts.length ? firsts[Math.floor(firsts.length * 0.5)] : -1,
+      lives: lives
+    };
+  }
+
+  /* ---------------- formatting ---------------- */
+  function moneyAxis(k) {
+    var a = Math.abs(k), sign = k < 0 ? "−" : "";
+    if (a < 1) return "0";
+    if (a >= 1000) return sign + (a / 1000).toFixed(a >= 10000 ? 0 : 1) + "m";
+    return sign + Math.round(a) + "k";
+  }
+
+  function money(k) {
+    var a = Math.abs(k);
+    var sign = k < 0 ? "−" : "";
+    if (a < 1) return "CHF\u00A00";
+    if (a >= 1000) return sign + "CHF\u00A0" + (a / 1000).toFixed(a >= 10000 ? 0 : 1) + "m";
+    return sign + "CHF\u00A0" + Math.round(a) + "k";
+  }
+  function pct(x) { return Math.round(x * 100) + "%"; }
+  function monthsToYears(m) {
+    if (m < 0) return "never";
+    var y = m / 12;
+    return y < 1 ? Math.round(m) + " months" : y.toFixed(1) + " years";
+  }
+
+  /* ---------------- charts ---------------- */
+  function css(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+
+  function prep(cv) {
+    var dpr = window.devicePixelRatio || 1;
+    var w = cv.clientWidth || 600;
+    var h = Number(cv.getAttribute("data-h") || cv.getAttribute("height"));
+    cv.setAttribute("data-h", String(h));
+    cv.width = Math.round(w * dpr);
+    cv.height = Math.round(h * dpr);
+    cv.style.height = h + "px";
+    var ctx = cv.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    return { ctx: ctx, w: w, h: h };
+  }
+
+  function axes(ctx, x0, y0, x1, y1, line) {
+    ctx.strokeStyle = line; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x0, y1); ctx.lineTo(x1, y1); ctx.stroke();
+  }
+
+  function drawMoney(R) {
+    var cv = document.getElementById("c-money");
+    var p = prep(cv), ctx = p.ctx;
+    var L = 46, Rp = 14, T = 12, B = 26;
+    var x0 = L, x1 = p.w - Rp, y0 = T, y1 = p.h - B;
+    var n = R.months;
+    var max = 0, i;
+    for (i = 0; i < n; i++) { max = Math.max(max, R.cost[i], R.vHi[i]); }
+    max = max * 1.08 || 1;
+    var X = function (i) { return x0 + (x1 - x0) * (i / Math.max(1, n - 1)); };
+    var Y = function (v) { return y1 - (y1 - y0) * (v / max); };
+
+    var line = css("--line"), muted = css("--muted");
+    ctx.font = "11px " + css("--mono");
+    ctx.fillStyle = muted; ctx.textAlign = "right";
+    for (var t = 0; t <= 4; t++) {
+      var v = max * t / 4, y = Y(v);
+      ctx.strokeStyle = line; ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x1, y); ctx.stroke();
+      ctx.fillText(moneyAxis(v), x0 - 6, y + 3.5);
+    }
+    ctx.textAlign = "center";
+    for (var yr = 0; yr <= S.horizon; yr++) {
+      var idx = Math.min(n - 1, yr * 12);
+      ctx.fillText("Y" + yr, X(idx), y1 + 16);
+    }
+
+    // band
+    ctx.fillStyle = css("--teal") + "22";
+    ctx.beginPath();
+    for (i = 0; i < n; i++) { var xx = X(i), yy = Y(R.vHi[i]); i === 0 ? ctx.moveTo(xx, yy) : ctx.lineTo(xx, yy); }
+    for (i = n - 1; i >= 0; i--) ctx.lineTo(X(i), Y(R.vLo[i]));
+    ctx.closePath(); ctx.fill();
+
+    function poly(arr, colour, width) {
+      ctx.strokeStyle = colour; ctx.lineWidth = width; ctx.beginPath();
+      for (var k = 0; k < n; k++) { var x = X(k), y = Y(arr[k]); k === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); }
+      ctx.stroke();
+    }
+    poly(R.cost, css("--brick"), 2);
+    poly(R.vMed, css("--teal"), 2.4);
+
+    if (R.breakeven >= 0) {
+      var bx = X(R.breakeven);
+      ctx.strokeStyle = css("--gold"); ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(bx, y0); ctx.lineTo(bx, y1); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = css("--gold"); ctx.textAlign = bx > x1 - 90 ? "right" : "left";
+      ctx.fillText("money back after " + monthsToYears(R.breakeven), bx + (bx > x1 - 90 ? -5 : 5), y0 + 11);
+    }
+    axes(ctx, x0, y0, x1, y1, line);
+  }
+
+  var STAGE_NAMES = ["Define", "Explore", "Test", "Pilot", "Live"];
+  function stageColours() {
+    return [css("--muted"), css("--teal"), css("--gold"), css("--brick"), css("--plum")];
+  }
+
+  function drawPipe(R) {
+    var cv = document.getElementById("c-pipe");
+    var p = prep(cv), ctx = p.ctx;
+    var L = 34, Rp = 10, T = 10, B = 26;
+    var x0 = L, x1 = p.w - Rp, y0 = T, y1 = p.h - B;
+    var n = R.months, i, s;
+    var tot = new Float64Array(n);
+    for (i = 0; i < n; i++) for (s = 0; s < 5; s++) tot[i] += R.pipe[s][i];
+    var max = 0;
+    for (i = 0; i < n; i++) max = Math.max(max, tot[i]);
+    max = max * 1.1 || 1;
+    var X = function (i) { return x0 + (x1 - x0) * (i / Math.max(1, n - 1)); };
+    var Y = function (v) { return y1 - (y1 - y0) * (v / max); };
+    var line = css("--line"), muted = css("--muted"), cols = stageColours();
+
+    ctx.font = "11px " + css("--mono");
+    ctx.fillStyle = muted; ctx.textAlign = "right";
+    for (var t = 0; t <= 3; t++) {
+      var v = max * t / 3, y = Y(v);
+      ctx.strokeStyle = line; ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x1, y); ctx.stroke();
+      ctx.fillText(v.toFixed(0), x0 - 6, y + 3.5);
+    }
+    ctx.textAlign = "center";
+    for (var yr = 0; yr <= S.horizon; yr++) ctx.fillText("Y" + yr, X(Math.min(n - 1, yr * 12)), y1 + 16);
+
+    var base = new Float64Array(n);
+    for (s = 0; s < 5; s++) {
+      ctx.fillStyle = cols[s] + (s === 4 ? "44" : "7A");
+      ctx.beginPath();
+      for (i = 0; i < n; i++) { var xx = X(i), yy = Y(base[i] + R.pipe[s][i]); i === 0 ? ctx.moveTo(xx, yy) : ctx.lineTo(xx, yy); }
+      for (i = n - 1; i >= 0; i--) ctx.lineTo(X(i), Y(base[i]));
+      ctx.closePath(); ctx.fill();
+      for (i = 0; i < n; i++) base[i] += R.pipe[s][i];
+    }
+    axes(ctx, x0, y0, x1, y1, line);
+
+    var leg = document.getElementById("pipeLegend");
+    leg.innerHTML = "";
+    for (s = 0; s < 5; s++) {
+      var sp = document.createElement("span");
+      var sw = document.createElement("i");
+      sw.className = "swatch";
+      sw.style.background = cols[s];
+      sw.style.opacity = s === 4 ? ".55" : ".8";
+      sp.appendChild(sw);
+      sp.appendChild(document.createTextNode(STAGE_NAMES[s]));
+      leg.appendChild(sp);
+    }
+  }
+
+  function drawDist(R) {
+    var cv = document.getElementById("c-dist");
+    var p = prep(cv), ctx = p.ctx;
+    var L = 46, Rp = 14, T = 12, B = 26;
+    var x0 = L, x1 = p.w - Rp, y0 = T, y1 = p.h - B;
+    var lo = R.nets[0], hi = R.nets[R.nets.length - 1];
+    if (hi - lo < 1) { hi = lo + 1; }
+    var bins = 26, counts = new Array(bins).fill(0), i;
+    for (i = 0; i < R.nets.length; i++) {
+      var b = Math.min(bins - 1, Math.floor((R.nets[i] - lo) / (hi - lo) * bins));
+      counts[b]++;
+    }
+    var cmax = Math.max.apply(null, counts) || 1;
+    var line = css("--line"), muted = css("--muted");
+    ctx.font = "11px " + css("--mono");
+
+    var bw = (x1 - x0) / bins;
+    for (i = 0; i < bins; i++) {
+      var centre = lo + (i + 0.5) / bins * (hi - lo);
+      var h = (y1 - y0) * (counts[i] / cmax);
+      ctx.fillStyle = centre >= 0 ? css("--teal") : css("--brick");
+      ctx.globalAlpha = 0.75;
+      ctx.fillRect(x0 + i * bw + 1, y1 - h, bw - 2, h);
+      ctx.globalAlpha = 1;
+    }
+    if (lo < 0 && hi > 0) {
+      var zx = x0 + (0 - lo) / (hi - lo) * (x1 - x0);
+      ctx.strokeStyle = css("--gold"); ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(zx, y0); ctx.lineTo(zx, y1); ctx.stroke();
+    }
+    ctx.fillStyle = muted; ctx.textAlign = "left";
+    ctx.fillText(moneyAxis(lo), x0, y1 + 16);
+    ctx.textAlign = "right";
+    ctx.fillText(moneyAxis(hi), x1, y1 + 16);
+    ctx.textAlign = "center";
+    ctx.fillText("money in or out after " + S.horizon + " years, CHF", (x0 + x1) / 2, y1 + 16);
+    axes(ctx, x0, y0, x1, y1, line);
+  }
+
+  /* ---------------- output ---------------- */
+  var baseline = null;
+
+  function tile(k, v, delta) {
+    var d = document.createElement("div");
+    d.className = "tile";
+    var kk = document.createElement("div"); kk.className = "k"; kk.textContent = k;
+    var vv = document.createElement("div"); vv.className = "v"; vv.textContent = v;
+    d.appendChild(kk); d.appendChild(vv);
+    if (delta) {
+      var dd = document.createElement("div");
+      dd.className = "d" + (delta.dir > 0 ? " up" : delta.dir < 0 ? " down" : "");
+      dd.textContent = delta.text;
+      d.appendChild(dd);
+    }
+    return d;
+  }
+
+  function render(R) {
+    var t = document.getElementById("tiles");
+    t.innerHTML = "";
+    var totalLive = R.lives[0] + R.lives[1] + R.lives[2];
+
+    function dl(now, was, better, fmt) {
+      if (baseline == null || was == null) return null;
+      var diff = now - was;
+      if (Math.abs(diff) < 1e-9) return { dir: 0, text: "same as saved setting" };
+      var dir = (diff > 0 ? 1 : -1) * (better ? 1 : -1);
+      return { dir: dir, text: (diff > 0 ? "+" : "−") + fmt(Math.abs(diff)) + " vs saved" };
+    }
+
+    t.appendChild(tile("Money in or out after " + S.horizon + " years",
+      money(R.netMed),
+      dl(R.netMed, baseline && baseline.netMed, true, money)));
+    t.appendChild(tile("Chance of making money",
+      pct(R.pPos),
+      dl(R.pPos, baseline && baseline.pPos, true, function (x) { return Math.round(x * 100) + " pts"; })));
+    t.appendChild(tile("When you get your money back",
+      R.breakeven < 0 ? "not in this time" : monthsToYears(R.breakeven),
+      null));
+    t.appendChild(tile("Ideas launched",
+      totalLive.toFixed(1),
+      dl(totalLive, baseline && baseline.totalLive, true, function (x) { return x.toFixed(1); })));
+    t.appendChild(tile("Cost of mistakes", R.advMed > 0 ? money(R.advMed) : "none", null));
+    t.appendChild(tile("Normal work given up", S.share + "%", null));
+
+    drawMoney(R); drawPipe(R); drawDist(R);
+
+    var ul = document.getElementById("readout");
+    ul.innerHTML = "";
+    var lines = [];
+
+    lines.push("Giving " + S.share + "% of the team to new ideas costs " +
+      money(R.P.monthlyCost * 12) + " every year, before anything reaches a customer.");
+
+    if (R.breakeven < 0) {
+      lines.push("You never get the money back inside " + S.horizon + " years. Either you are looking at too short a time, or too few ideas are reaching launch.");
+    } else {
+      lines.push("You get the money back after " + monthsToYears(R.breakeven) + ". After three years the chance of being ahead is " + pct(R.pPos36) + ". That is the number a careful board will look at first.");
+    }
+
+    lines.push("Of the ideas that launch, about " + R.lives[0].toFixed(1) + " are small improvements, " +
+      R.lives[1].toFixed(1) + " are extensions and " + R.lives[2].toFixed(1) + " are completely new. " +
+      (R.lives[2] < 0.5
+        ? "At this setting the completely new ideas almost never arrive, so the best results in the chart are much less likely."
+        : "The completely new ones are rare, but they produce most of the best results in the chart."));
+
+    if (S.prot < 100) {
+      lines.push("Only " + S.prot + "% of the time is protected, so every step takes about " +
+        Math.round((R.P.preempt - 1) * 100) + "% longer than the weeks you entered. Normal work keeps taking the people back.");
+    } else {
+      lines.push("All the time is protected, so every step takes the number of weeks you entered. Lower the protection slider and watch the same money buy less.");
+    }
+
+    lines.push(R.advMed > 0
+      ? "Testing in " + WIDTH_NAME[S.width] + " makes the usual cost of mistakes " + money(R.advMed) + " over " + S.horizon + " years."
+      : "Testing in " + WIDTH_NAME[S.width] + " is small enough that in more than half the runs nothing went wrong at all. Make the pilot bigger and watch this change.");
+
+    lines.push(S.strict === 100
+      ? "The gates are set exactly as you entered them. Move the slider each way: strict gates give you fewer ideas but better ones, loose gates give you more of everything, and the result gets worse at both ends."
+      : (S.strict > 100
+        ? "The gates are strict, so fewer ideas reach launch. The ones that do are worth more than the average number you entered."
+        : "The gates are loose, so more ideas reach launch, including weak ones. Each launched idea is worth less than the average number you entered."));
+
+    lines.forEach(function (txt) {
+      var li = document.createElement("li");
+      li.textContent = txt;
+      ul.appendChild(li);
+    });
+
+    lastResult = R;
+    lastResult.totalLive = totalLive;
+  }
+
+  /* ---------------- wiring ---------------- */
+  var lastResult = null, pending = null;
+
+  function scheduleRun() {
+    if (pending) cancelAnimationFrame(pending);
+    pending = requestAnimationFrame(function () { pending = null; render(simulate()); });
+  }
+
+  function bindRange(id, key, fmt, extra) {
+    var el = document.getElementById("s-" + id);
+    var out = document.getElementById("v-" + id);
+    function upd() {
+      S[key] = Number(el.value);
+      if (out) out.textContent = fmt(S[key]);
+      if (extra) extra();
+      scheduleRun();
+    }
+    el.addEventListener("input", upd);
+    return upd;
+  }
+
+  function mixText() {
+    var trans = S.trans, adj = Math.min(100 - trans, S.adj), core = 100 - trans - adj;
+    document.getElementById("sub-mix").textContent =
+      "Small improvements " + core + "%  ·  extensions " + adj + "%  ·  completely new " + trans + "%";
+  }
+  function shareText() {
+    var fte = (val("engineers") * S.share / 100);
+    document.getElementById("sub-share").textContent =
+      fte.toFixed(1) + " people, " + money(fte * val("costPer")) + " a year";
+  }
+  function widthText() {
+    var w = S.width;
+    document.getElementById("sub-width").textContent =
+      ["Slowest answer, smallest risk.", "In between.", "Fastest answer, biggest risk."][w];
+  }
+
+  function init() {
+    buildFields();
+    updateTally();
+
+    bindRange("horizon", "horizon", function (v) { return v + (v === 1 ? " year" : " years"); });
+    var updShare = bindRange("share", "share", function (v) { return v + "%"; }, shareText);
+    bindRange("trans", "trans", function (v) { return v + "%"; }, mixText);
+    bindRange("adj", "adj", function (v) { return v + "%"; }, mixText);
+    bindRange("strict", "strict", function (v) {
+      return v === 100 ? "As entered" : (v < 100 ? "Lenient " : "Strict ") + v + "%";
+    });
+    bindRange("pace", "pace", function (v) {
+      return v === 100 ? "As entered" : (v < 100 ? "Faster " : "Slower ") + v + "%";
+    });
+    bindRange("prot", "prot", function (v) { return v + "%"; });
+
+    Array.prototype.forEach.call(document.querySelectorAll("#seg-width button"), function (b) {
+      b.addEventListener("click", function () {
+        Array.prototype.forEach.call(document.querySelectorAll("#seg-width button"), function (x) { x.classList.remove("on"); });
+        b.classList.add("on");
+        S.width = Number(b.getAttribute("data-w"));
+        widthText();
+        scheduleRun();
+      });
+    });
+
+    Array.prototype.forEach.call(document.querySelectorAll(".ctrl[data-help]"), function (ctrl) {
+      var key = ctrl.getAttribute("data-help");
+      var head = ctrl.querySelector(".ctrl-head");
+      var nameEl = head.querySelector(".name");
+      var nw = document.createElement("span");
+      nw.className = "name-wrap";
+      nameEl.parentNode.insertBefore(nw, nameEl);
+      nw.appendChild(nameEl);
+      nw.appendChild(helpButton("h-ctrl-" + key, nameEl.textContent));
+      ctrl.appendChild(helpPanel("h-ctrl-" + key, CTRL_HELP[key]));
+    });
+
+    Array.prototype.forEach.call(document.querySelectorAll(".helptoggle button"), function (t) {
+      t.addEventListener("click", function () {
+        setAllHelp(t.getAttribute("aria-pressed") !== "true");
+      });
+    });
+
+    mixText(); shareText(); widthText();
+
+    document.getElementById("resetDefaults").addEventListener("click", function () {
+      FIELDS.forEach(function (f) { inputs[f.id].el.value = String(f.def); markField(f.id); });
+      updateTally(); updateFunnel(); shareText(); scheduleRun();
+    });
+
+    document.getElementById("pinBase").addEventListener("click", function () {
+      if (!lastResult) return;
+      baseline = { netMed: lastResult.netMed, pPos: lastResult.pPos, totalLive: lastResult.totalLive };
+      toast("Setting saved. Every box now shows the change against it.");
+      render(simulate());
+    });
+
+    document.getElementById("copySummary").addEventListener("click", function () {
+      if (!lastResult) return;
+      var R = lastResult;
+      var txt = [
+        "Innovation settings",
+        "Years looked ahead: " + S.horizon,
+        "Share of the team on new ideas: " + S.share + "% (" + (val("engineers") * S.share / 100).toFixed(1) + " people)",
+        "Mix: small improvements " + (100 - S.trans - Math.min(100 - S.trans, S.adj)) + "% / extensions " + Math.min(100 - S.trans, S.adj) + "% / completely new " + S.trans + "%",
+        "Gates: " + S.strict + "%   Speed: " + S.pace + "%   Protected time: " + S.prot + "%",
+        "Pilot size: " + WIDTH_NAME[S.width],
+        "",
+        "Money in or out after " + S.horizon + " years (middle result): " + money(R.netMed),
+        "Range of results: " + money(R.netLo) + " to " + money(R.netHi),
+        "Chance of making money: " + pct(R.pPos) + " (after three years: " + pct(R.pPos36) + ")",
+        "Money back: " + (R.breakeven < 0 ? "not in this time" : monthsToYears(R.breakeven)),
+        "Ideas launched: " + R.totalLive.toFixed(1),
+        "Typical cost of mistakes: " + money(R.advMed)
+      ].join("\n");
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(txt).then(function () { toast("Copied."); },
+          function () { toast("Copying did not work here. Write the numbers down instead."); });
+      } else {
+        toast("Copying is not available here.");
+      }
+    });
+
+    ["change"].forEach(function (ev) {
+      FIELDS.forEach(function (f) { inputs[f.id].el.addEventListener(ev, shareText); });
+    });
+
+    render(simulate());
+
+    var mq = window.matchMedia("(prefers-color-scheme: dark)");
+    if (mq.addEventListener) mq.addEventListener("change", function () { if (lastResult) render(lastResult); });
+    window.addEventListener("resize", function () { if (lastResult) { drawMoney(lastResult); drawPipe(lastResult); drawDist(lastResult); } });
+  }
+
+  function toast(msg) {
+    var el = document.getElementById("toast");
+    el.textContent = msg;
+    setTimeout(function () { if (el.textContent === msg) el.textContent = ""; }, 4000);
+  }
+
+  init();
+})();
+</script>
